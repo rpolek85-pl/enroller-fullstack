@@ -1,28 +1,33 @@
 import "milligram";
 import './App.css';
-import {useState} from "react";
+import { useState } from "react";
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+
 import LoginForm from "./LoginForm";
 import UserPanel from "./UserPanel";
 
 function App() {
-    const [loggedIn, setLoggedIn] = useState('');
+  const [email, setEmail] = useState("");
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-    function login(email) {
-        if (email) {
-            setLoggedIn(email);
-        }
-    }
+  function loginIn(emailFromForm) {
+    setEmail(emailFromForm);
+    setIsLoggedIn(true);
+  }
 
-    function logout() {
-        setLoggedIn('');
-    }
+  function loginOut() {
+    setEmail("");
+    setIsLoggedIn(false);
+  }
 
-    return (
-        <div>
-            <h1>System do zapisów na zajęcia</h1>
-            {loggedIn ? <UserPanel username={loggedIn} onLogout={logout}/> : <LoginForm onLogin={login}/>}
-        </div>
-    );
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<LoginForm onLogin={loginIn} />} />
+        <Route path="/UserPanel" element={<UserPanel username={email} onLogout={loginOut} isLoggedIn={isLoggedIn}/>} />
+      </Routes>
+    </Router>
+  );
 }
 
 export default App;
