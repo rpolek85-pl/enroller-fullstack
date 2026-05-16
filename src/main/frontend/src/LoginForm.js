@@ -1,8 +1,12 @@
 import { Link } from 'react-router-dom';
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function LoginForm(props) {
     const [email, setEmail] = useState('rpolek@gmail.com');
+
+    useEffect(() => {
+        document.title = "Logowanie";
+    }, []);
 
     let msg;
     if (email.length < 6) {

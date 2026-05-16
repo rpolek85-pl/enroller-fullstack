@@ -49,9 +49,9 @@ export default function MeetingsPage({username}) {
                     ? <NewMeetingForm onSubmit={(meeting) => handleNewMeeting(meeting)}/>
                     : <button onClick={() => setAddingNewMeeting(true)}>Dodaj nowe spotkanie</button>
             }
-            {meetings.length > 0 &&
-                <MeetingsList meetings={meetings} username={username}
-                              onDelete={handleDeleteMeeting}/>}
+            {meetings.length > 0
+                ? <MeetingsList meetings={meetings} username={username} onDelete={handleDeleteMeeting}/>
+                : <div>Lista spotkań jest pusta</div>}
         </div>
     )
 }
