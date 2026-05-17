@@ -1,6 +1,4 @@
-export default function MeetingsList({meetings, onDelete}) {
-    ///<button onClick={() => setAddingNewMeeting(true)}>Dodaj nowe spotkanie</button>
-
+export default function MeetingsList({meetings, username,  onDelete, onJoin}) {
     return (
         <table>
             <thead>
@@ -16,9 +14,13 @@ export default function MeetingsList({meetings, onDelete}) {
                 meetings.map((meeting, index) => <tr key={index}>
                     <td>{meeting.title}</td>
                     <td>{meeting.description}</td>
-                    <td></td>
                     <td>
-                        <button>Zpisz się</button>
+                        {meeting.participants && meeting.participants.length > 0
+                            ? meeting.participants.join(", ")
+                            : "Brak uczestników"}
+                    </td>
+                    <td>
+                        <button onClick={() => onJoin(meeting, username)}>Zapisz się</button>
                         <button onClick={() => onDelete(meeting)}>Usuń</button>
                     </td>
 

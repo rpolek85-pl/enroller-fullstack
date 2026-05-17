@@ -41,6 +41,21 @@ export default function MeetingsPage({username}) {
         }
     }
 
+    async function handleJoinMeeting(meeting, username) {
+        const response = await fetch(`/api/meetings/${meeting.id}/participants/${username}`, {
+            method: 'POST'
+        });
+
+        if (response.ok) {
+            const updatedMeetings = meetings.map(m =>
+                m.id === meeting.id
+                    ? { ...m, participants: [...(m.participants || []), username] }
+                    : m
+            );
+            setMeetings(updatedMeetings);
+        }
+    }
+
     return (
         <div>
             <h2>Zajęcia ({meetings.length})</h2>
@@ -50,7 +65,11 @@ export default function MeetingsPage({username}) {
                     : <button onClick={() => setAddingNewMeeting(true)}>Dodaj nowe spotkanie</button>
             }
             {meetings.length > 0
-                ? <MeetingsList meetings={meetings} username={username} onDelete={handleDeleteMeeting}/>
+                ? <MeetingsList
+                    meetings={meetings}
+                    username={username}
+                    onDelete={handleDeleteMeeting}
+                    onJoin={handleJoinMeeting}/>
                 : <div>Lista spotkań jest pusta</div>}
         </div>
     )
