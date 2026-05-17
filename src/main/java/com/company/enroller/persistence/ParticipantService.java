@@ -57,7 +57,9 @@ public class ParticipantService {
         transaction.commit();
     }
 
-
+    public boolean passwordMatches(String rawPassword, String encodedPassword) {
+        return passwordEncoder.matches(rawPassword, encodedPassword);
+    }
 
 
 }

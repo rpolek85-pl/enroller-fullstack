@@ -83,6 +83,21 @@ public class ParticipantRestController {
 
     }
 
+    @RequestMapping(value = "/login", method = RequestMethod.POST)
+    public ResponseEntity<?> login(@RequestBody Participant loginRequest) {
+
+        Participant participant = participantService.findByLogin(loginRequest.getLogin());
+        if (participant == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        if (!participantService.passwordMatches(loginRequest.getPassword(), participant.getPassword())) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        
+        return new ResponseEntity<>(participant, HttpStatus.OK);
+    }
+
 
 
 }
