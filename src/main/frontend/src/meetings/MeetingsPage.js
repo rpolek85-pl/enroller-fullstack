@@ -49,7 +49,22 @@ export default function MeetingsPage({username}) {
         if (response.ok) {
             const updatedMeetings = meetings.map(m =>
                 m.id === meeting.id
-                    ? { ...m, participants: [...(m.participants || []), username] }
+                    ? { ...m, participants: [...(m.participants || []), {login: username}] }
+                    : m
+            );
+            setMeetings(updatedMeetings);
+        }
+    }
+
+    async function handleExitMeeting(meeting, username) {
+        const response = await fetch(`/api/meetings/${meeting.id}/participants/${username}`, {
+            method: 'DELETE'
+        });
+
+        if (response.ok) {
+            const updatedMeetings = meetings.map(m =>
+                m.id === meeting.id
+                    ? { ...m,  participants: m.participants.filter(p => p.login !== username) }
                     : m
             );
             setMeetings(updatedMeetings);
@@ -69,7 +84,8 @@ export default function MeetingsPage({username}) {
                     meetings={meetings}
                     username={username}
                     onDelete={handleDeleteMeeting}
-                    onJoin={handleJoinMeeting}/>
+                    onJoin={handleJoinMeeting}
+                    onExit={handleExitMeeting}/>
                 : <div>Lista spotkań jest pusta</div>}
         </div>
     )

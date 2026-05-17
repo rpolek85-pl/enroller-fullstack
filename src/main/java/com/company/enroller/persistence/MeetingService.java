@@ -81,4 +81,20 @@ public class MeetingService {
                 .list();
         return query.list().size() != 0;
     }
+
+    public Collection<Meeting> findMeetings(String title, String description, Participant participant, String sortMode) {
+        String hql = "FROM Meeting as meeting WHERE title LIKE :title AND description LIKE :description ";
+        if (participant != null) {
+            hql += " AND :participant in elements(participants)";
+        }
+        if (sortMode.equals("title")) {
+            hql += " ORDER BY title";
+        }
+        Query query = connector.getSession().createQuery(hql);
+        query.setParameter("title", "%" + title + "%").setParameter("description", "%" + description + "%");
+        if (participant != null) {
+            query.setParameter("participant", participant);
+        }
+        return query.list();
+    }
 }
