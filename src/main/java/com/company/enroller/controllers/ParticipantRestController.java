@@ -1,7 +1,5 @@
 package com.company.enroller.controllers;
-
 import java.util.Collection;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -82,22 +80,5 @@ public class ParticipantRestController {
         return new ResponseEntity(HttpStatus.OK);
 
     }
-
-    @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public ResponseEntity<?> login(@RequestBody Participant loginRequest) {
-
-        Participant participant = participantService.findByLogin(loginRequest.getLogin());
-        if (participant == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
-        if (!participantService.passwordMatches(loginRequest.getPassword(), participant.getPassword())) {
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-        }
-        
-        return new ResponseEntity<>(participant, HttpStatus.OK);
-    }
-
-
 
 }

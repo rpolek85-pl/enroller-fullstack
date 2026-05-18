@@ -3,6 +3,7 @@ package com.company.enroller.security;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -10,6 +11,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @EnableWebSecurity
@@ -38,31 +40,27 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
         auth.userDetailsService(participantProvider).passwordEncoder(passwordEncoder);
     }
 
-    //@Override
-    //protected void configure(HttpSecurity http) throws Exception {
-    //    http
-    //            .csrf().disable()
-    //            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-    //            .and()
-    //            .addFilterBefore(
-    //                    new JWTAuthenticationFilter(authenticationManager(), secret, issuer, tokenExpiration),
-    //                    UsernamePasswordAuthenticationFilter.class
-    //            )
-    //            .authorizeRequests()
-    //            .antMatchers(HttpMethod.POST, "/participants").permitAll()
-    //            .antMatchers("/tokens").permitAll()
-    //            .antMatchers("/**").authenticated();
-    //}
-
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
+                .addFilterBefore(
+                        new JWTAuthenticationFilter(authenticationManager(), secret, issuer, tokenExpiration),
+                        UsernamePasswordAuthenticationFilter.class
+                )
+                .addFilterBefore(
+                        new JWTAuthorizationFilter(authenticationManager(), secret),
+                        UsernamePasswordAuthenticationFilter.class
+                )
+                .exceptionHandling()
+                .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
+                .and()
                 .authorizeRequests()
-                .antMatchers("/**").permitAll()
-                .anyRequest().permitAll();
+                .antMatchers(HttpMethod.POST, "/api/participants").permitAll()
+                .antMatchers("/tokens").permitAll()
+                .antMatchers("/error").permitAll()
+                .antMatchers("/**").authenticated();
     }
-
 }

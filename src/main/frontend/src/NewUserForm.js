@@ -1,68 +1,51 @@
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 
-export default function LoginForm({ onLogin }) {
+export default function NewUserForm() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState(localStorage.getItem("email") || "rpolek@gmail.com");
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [msg, setMsg] = useState("");
 
   useEffect(() => {
-    document.title = "Logowanie";
+    document.title = "Nowy użytkownik";
   }, []);
 
-  useEffect(() => {
-    localStorage.setItem("email", email);
-  }, [email]);
+  async function handleNewUser(login, password) {
 
-  async function handleLogin(login, password) {
-
-      const resp = await fetch('/tokens', {
+      const resp = await fetch('/api/participants', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ login: login, password: password })
       });
 
       if (resp.ok) {
-        const data = await resp.json();
-        localStorage.setItem("isLogged", "true");
-        localStorage.setItem("token", data.token);
-        return { success: true, user: data };
+        return { success: true};
       }
 
-      if (resp.status === 401) {
-        return { success: false, error: "Nieprawidłowe dane logowania" };
+      if (resp.status === 409) {
+        return { success: false, error: "Użytkownik istnieje" };
       }
 
       return { success: false, error: "Błąd serwera"};
   }
 
-  async function handleSubmitLogin(e) {
+  async function onNewUser(e) {
     if (e && e.preventDefault) e.preventDefault();
     setMsg("");
-    const result = await handleLogin(email, password);
+    const result = await handleNewUser(email, password);
 
     if (result.success) {
-      onLogin(email);
-      navigate("/UserPanel");
+      navigate("/");
       setMsg('');
     } else {
       setMsg(result.error);
     }
   }
 
-  function onNewUser() {
-    navigate("/NewUserForm");
-  }
-
-
     return (
       <header className="container">
         <h1>Witaj w systemie do zapisów na zajęcia</h1>
-
-        <div className="column column-100 column-offset-25">
-            <button className="button button-outline logout-btn" onClick={onNewUser}>Załóż konto</button>
-        </div>
 
         <div className="form-group">
           <label htmlFor="email">Podaj e-mail:</label>
@@ -74,7 +57,7 @@ export default function LoginForm({ onLogin }) {
           <input id="password" value={password} onChange={(e) => setPassword(e.target.value)} />
         </div>
 
-        <button type="button" onClick={handleSubmitLogin}>Logowanie</button>
+        <button type="button" onClick={onNewUser}>Załóż konto</button>
 
         <p>{msg}</p>
       </header>
